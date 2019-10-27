@@ -4,11 +4,11 @@ import argparse
 import os
 import concurrent.futures
 
-# TODO: Deal with input that comes before the starting location
-# TODO: Add an option to set stdin to read from a file
-# TODO: Add the option the change the value of certain registers right at the first breakpoint
 # TODO: Allow users to bruteforce memory locations instead of just registers
+# TODO: Add the option the change the value of certain registers right at the first breakpoint
+# TODO: Add option to execute code right at the first breakpoint
 # TODO: Add an option to show an axis as hex values
+# TODO: Add option to set rip/eip equal to the first breakpoint instead of using a breakpoint
 
 # Setup the argument parser
 parser = argparse.ArgumentParser(description="Analyzes specified lines of code by executing the code using given input values, recording the output, and graphing the result.", usage='%(prog)s [options] filename start stop input output range')
@@ -19,6 +19,7 @@ parser.add_argument("input", help="The register or memory location that contains
 parser.add_argument("output", help="The register or memory location that contains the output values that should be checked after the code is executed.")
 parser.add_argument("range", help="The range of values that should be used for the input during the bruteforce process. Should be in the form \"[lower,upper]\" or \"[lower,upper,step]\". For example: [0,101,5] will use 0, 5, 10, ..., 95, 100 as the input values to be bruteforced.")
 parser.add_argument("-t", "--threads", nargs='?', dest="threads", default="5", help="The number of threads that will be used during execution. Default value is 5.")
+parser.add_argument("-in", "--standard-input", nargs='?', dest='input_file', default='', help="Uses the \'dor stdin=[INPUT_FILE]\' command in radare2 to make the executable read standard input from a given file instead of having the user type it in.")
 
 # Parse all of the arguments
 args = parser.parse_args()
@@ -38,20 +39,25 @@ step = 1
 if(len(valueRange) == 3):
     step = int(valueRange[2][:-1])
 threads = int(args.threads)
+input_file = args.input_file
 
 # List of tuples that contain the input and its corresponding output. These points will eventually be plotted onto the graph.
 points = []
 
 def execute(value):
     """ Executes some code using the given input and returns the output. """
-    # Load the binary in radare2 and go to the memory location that we need to be at
-    r = r2pipe.open(filename, flags=['d A Q'])
+    # Load the binary in radare2
+    r = r2pipe.open(filename, flags=['d', 'A'])
+
+    # If the standard input option is set, then set use the dor command to set stdin to the given file
+    if(stdin != ''):
+        r.cmd('dor stdin=' + input_file)
+
+    # Go to the memory location that we need to be at
     r.cmd('doo;db ' + start + ";db " + stop + ";dc")
 
-    # Set the register that we are bruteforcing
+    # Set the register that we are bruteforcing to the value that we want it to be and continue
     r.cmd('dr ' + bruteforce + ' = ' + str(value))
-
-    # Continue
     r.cmd('dc')
 
     # Read the value of the register that needs to be checked and record it
