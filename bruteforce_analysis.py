@@ -50,7 +50,7 @@ def execute(value):
     r = r2pipe.open(filename, flags=['d', 'A'])
 
     # If the standard input option is set, then set use the dor command to set stdin to the given file
-    if(stdin != ''):
+    if(input_file != ''):
         r.cmd('dor stdin=' + input_file)
 
     # Go to the memory location that we need to be at
