@@ -61,37 +61,3 @@ Furthermore, there is also a list of points printed out in the output:
 Points:
 [(0, 0), (1, 1), (2, 4), (4, 16), (3, 9), (5, 25), (7, 49), (6, 36), (8, 64), (9, 81), (14, 196), (10, 100), (11, 121), (12, 144), (13, 169), (17, 289), (16, 256), (15, 225), (18, 324), (19, 361), (23, 529), (20, 400), (21, 441), (22, 484), (24, 576), (26, 676), (25, 625), (28, 784), (27, 729), (30, 900), (29, 841), (32, 1024), (31, 961), (33, 1089), (35, 1225), (36, 1296), (34, 1156), (37, 1369), (38, 1444), (41, 1681), (39, 1521), (40, 1600), (42, 1764), (43, 1849), (46, 2116), (44, 1936), (45, 2025), (47, 2209), (49, 2401), (50, 2500), (48, 2304), (51, 2601), (53, 2809), (54, 2916), (52, 2704), (55, 3025), (56, 3136), (57, 3249), (58, 3364), (60, 3600), (59, 3481), (61, 3721), (62, 3844), (64, 4096), (63, 3969), (65, 4225), (66, 4356), (71, 5041), (67, 4489), (68, 4624), (70, 4900), (69, 4761), (72, 5184), (76, 5776), (74, 5476), (75, 5625), (73, 5329), (80, 6400), (81, 6561), (78, 6084), (77, 5929), (79, 6241), (85, 7225), (83, 6889), (84, 7056), (86, 7396), (82, 6724), (88, 7744), (89, 7921), (87, 7569), (90, 8100), (91, 8281), (94, 8836), (93, 8649), (92, 8464), (96, 9216), (95, 9025), (97, 9409), (98, 9604), (99, 9801)]
 ```
-
-### Usage
-```
-usage: bruteforce_analysis.py [options] filename start stop input output range
-
-Analyzes specified lines of code by executing the code using given input
-values, recording the output, and graphing the result.
-
-positional arguments:
-  filename              The name of the executable you would like to
-                        bruteforce.
-  start                 The first breakpoint will be set at this location. The
-                        input register or memory location will be changed to
-                        the next value in the range.
-  stop                  The second breakpoint will be set at this location.
-                        The output will be recorded at this location and the
-                        process will be stopped.
-  input                 The register or memory location that contains the
-                        input value that should be bruteforced.
-  output                The register or memory location that contains the
-                        output values that should be checked after the code is
-                        executed.
-  range                 The range of values that should be used for the input
-                        during the bruteforce process. Should be in the form
-                        "[lower,upper]" or "[lower,upper,step]". For example:
-                        [0,101,5] will use 0, 5, 10, ..., 95, 100 as the input
-                        values to be bruteforced.
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -t [THREADS], --threads [THREADS]
-                        The number of threads that will be used during
-                        execution. Default value is 5.
-```
