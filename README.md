@@ -73,11 +73,11 @@ values, recording the output, and graphing the result.
 positional arguments:
   filename              The name of the executable you would like to
                         bruteforce.
-  start                 The first breakpoint will be set at this location,
-                        where the input register or memory location will be
-                        changed to the next value in the range.
-  stop                  The second breakpoint will be set at this location,
-                        where the output will be recorded.
+  start                 The first breakpoint will be set at this location. At
+                        the breakpoint, the input register or memory location
+                        will be changed to the next value in the range.
+  stop                  The second breakpoint will be set at this location. At
+                        the breakpoint, the output will be recorded.
   input                 The register or memory location that contains the
                         input value that should be bruteforced. Example:
                         "eax". If using a memory location, please specify the
@@ -117,5 +117,9 @@ optional arguments:
   -e [COMMANDS], --execute [COMMANDS]
                         Executes the given r2 commands in radare2 right after
                         the debugger hits the first breakpoint, but before the
-                        input value is set.
+                        input value is set. Example: -e "dr ebx = 7" will
+                        always set ebx equal to 7 at the first breakpoint.
+                        Multiple commands can be separated by a semicolon.
+  -hx, --x-axis-hex     Displays the x-axis in hexadecimal instead of denary.
+  -hy, --y-axis-hex     Displays the y-axis in hexadecimal instead of denary.
 ```

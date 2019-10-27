@@ -1,10 +1,10 @@
 import r2pipe
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import argparse
 import os
 import concurrent.futures
 
-# TODO: Add an option to show an axis as hex values and bruteforce hex values
 # TODO: Add option to set rip/eip equal to the first breakpoint instead of using a breakpoint
 
 # Setup the argument parser
@@ -20,6 +20,8 @@ parser.add_argument("-in", "--standard-input", nargs='?', dest='input_file', def
 parser.add_argument("-il", "--input-length", nargs='?', dest='input_length', default='1', help="The amount of bytes placed at the input memory location. Default value is 1, but this will be automatically adjusted if it is too small. Is only used if the input is a memory location and not a register.")
 parser.add_argument("-ol", "--output-length", nargs='?', dest='output_length', default='1', help="The amount of bytes read at the output memory location. Must be equal to either 1, 2, 4, or 8. Default value is 1. Is only used if the output is a memory location and not a register.")
 parser.add_argument("-e", "--execute", nargs='?', dest='commands', type=str, default='', help="Executes the given r2 commands in radare2 right after the debugger hits the first breakpoint, but before the input value is set. Example: -e \"dr ebx = 7\" will always set ebx equal to 7 at the first breakpoint. Multiple commands can be separated by a semicolon.")
+parser.add_argument("-hx", "--x-axis-hex", dest='x_is_hex', action='store_const', const=True, default=False, help="Displays the x-axis in hexadecimal instead of denary.")
+parser.add_argument("-hy", "--y-axis-hex", dest='y_is_hex', action='store_const', const=True, default=False, help="Displays the y-axis in hexadecimal instead of denary.")
 
 # Parse all of the arguments
 args = parser.parse_args()
@@ -51,6 +53,8 @@ input_file = args.input_file
 input_length = args.input_length
 output_length = args.output_length
 commands = args.commands
+x_is_hex = args.x_is_hex
+y_is_hex = args.y_is_hex
 
 # List of tuples that contain the input and its corresponding output. These points will eventually be plotted onto the graph.
 points = []
@@ -108,4 +112,16 @@ plt.scatter(*xy)
 plt.title('Bruteforcing ' + bruteforce + ' @' + start)
 plt.xlabel(bruteforce + '\'s starting values @' + start)
 plt.ylabel(output + '\'s ending values @' + stop)
+
+# Display the results in hex if necessary
+axes = plt.gca()
+
+if(x_is_hex): # Displays x-axis in hex if necessary
+    xlabels = map(lambda t: '0x%08X' % int(t), axes.get_xticks())
+    axes.set_xticklabels(xlabels)
+if(y_is_hex): # Displays y-axis in hex if necessary
+    ylabels = map(lambda t: '0x%08X' % int(t), axes.get_yticks())
+    axes.set_yticklabels(ylabels)
+
+# Show the results
 plt.show()
