@@ -1,5 +1,5 @@
 # Binary Bruteforce Analyzer
-This program will allow a reverse engineer to analyze a several lines of code by bruteforcing the input values to those lines of code, recording the output, and displaying the results on a graph. Please note that this is currently a work in progress, and it there may be lots of bugs at this point in time.
+This program will allow a reverse engineer to analyze a several lines of code by bruteforcing the input values to those lines of code, recording the output, and displaying the results on a graph. Please note that this is currently a work in progress, and there may be many bugs at this point in time.
 
 ### Required
 * radare2
