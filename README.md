@@ -1,5 +1,5 @@
 # Binary Bruteforce Analyzer
-This program will allow a reverse engineer to analyze a several lines of code by bruteforcing the input values to those lines of code, recording the output, and displaying the results on a graph. Please note that this is currently a work in progress, and there may be many bugs at this point in time.
+This program will allow a reverse engineer to analyze a several lines of code by bruteforcing the input values to those lines of code, recording the output, and displaying the results on a graph.
 
 ### Required
 * radare2
@@ -122,4 +122,11 @@ optional arguments:
                         Multiple commands can be separated by a semicolon.
   -hx, --x-axis-hex     Displays the x-axis in hexadecimal instead of denary.
   -hy, --y-axis-hex     Displays the y-axis in hexadecimal instead of denary.
+  -j, --jump            Instead of running all of the code that comes before
+                        the breakpoint, if this option is set, rip will
+                        immidiately be set to the start value as soon as the
+                        program opens. This will essentially jump over any
+                        code that comes before the first breakpoint, and it
+                        will make the program only execute the code between
+                        the starting and stopping breakpoints.
 ```
