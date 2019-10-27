@@ -1,5 +1,5 @@
 # Code Grapher
-This program will allow a reverse engineer to analyze a several lines of code by bruteforcing the input values to those lines of code, recording the output, and displaying the results on a graph.
+This program will allow a reverse engineer to analyze a several lines of code by brute-forcing the input values to those lines of code, recording the output, and displaying the results on a graph.
 
 ### Required
 * python3
