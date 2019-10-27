@@ -106,9 +106,9 @@ def execute(value):
 with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
     executor.map(execute, range(lower_bound, upper_bound, step))
 
-# Print out the points
+# Print out the points in sorted order
 print("Points:")
-print(points)
+print(sorted(points, key=lambda x: x[0]))
 
 # Convert the list of points into two tuples. The first tuple will contain the x values (inputs) and the second tuple will contain the y values (results). 
 # This is done to convert the points into a format that matplotlib accepts
