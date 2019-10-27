@@ -19,7 +19,7 @@ parser.add_argument("-t", "--threads", nargs='?', dest="threads", default="5", h
 parser.add_argument("-in", "--standard-input", nargs='?', dest='input_file', default='', help="Uses the \'dor stdin=[INPUT_FILE]\' command in radare2 to make the executable read standard input from a given file instead of having the user type it in.")
 parser.add_argument("-il", "--input-length", nargs='?', dest='input_length', default='1', help="The amount of bytes placed at the input memory location. Default value is 1, but this will be automatically adjusted if it is too small. Is only used if the input is a memory location and not a register.")
 parser.add_argument("-ol", "--output-length", nargs='?', dest='output_length', default='1', help="The amount of bytes read at the output memory location. Must be equal to either 1, 2, 4, or 8. Default value is 1. Is only used if the output is a memory location and not a register.")
-parser.add_argument("-e", "--execute", nargs='?', dest='commands', type=str, default='', help="Executes the given commands in radare2 right after the debugger hits the first breakpoint and sets the input value.")
+parser.add_argument("-e", "--execute", nargs='?', dest='commands', type=str, default='', help="Executes the given r2 commands in radare2 right after the debugger hits the first breakpoint, but before the input value is set.")
 
 # Parse all of the arguments
 args = parser.parse_args()
