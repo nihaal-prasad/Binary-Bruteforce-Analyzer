@@ -4,7 +4,6 @@ import argparse
 import os
 import concurrent.futures
 
-# TODO: Add option to execute code right at the first breakpoint
 # TODO: Add an option to show an axis as hex values and bruteforce hex values
 # TODO: Add option to set rip/eip equal to the first breakpoint instead of using a breakpoint
 
@@ -20,6 +19,7 @@ parser.add_argument("-t", "--threads", nargs='?', dest="threads", default="5", h
 parser.add_argument("-in", "--standard-input", nargs='?', dest='input_file', default='', help="Uses the \'dor stdin=[INPUT_FILE]\' command in radare2 to make the executable read standard input from a given file instead of having the user type it in.")
 parser.add_argument("-il", "--input-length", nargs='?', dest='input_length', default='1', help="The amount of bytes placed at the input memory location. Default value is 1, but this will be automatically adjusted if it is too small. Is only used if the input is a memory location and not a register.")
 parser.add_argument("-ol", "--output-length", nargs='?', dest='output_length', default='1', help="The amount of bytes read at the output memory location. Must be equal to either 1, 2, 4, or 8. Default value is 1. Is only used if the output is a memory location and not a register.")
+parser.add_argument("-e", "--execute", nargs='?', dest='commands', type=str, default='', help="Executes the given commands in radare2 right after the debugger hits the first breakpoint and sets the input value.")
 
 # Parse all of the arguments
 args = parser.parse_args()
@@ -50,6 +50,7 @@ threads = int(args.threads)
 input_file = args.input_file
 input_length = args.input_length
 output_length = args.output_length
+commands = args.commands
 
 # List of tuples that contain the input and its corresponding output. These points will eventually be plotted onto the graph.
 points = []
@@ -65,6 +66,9 @@ def execute(value):
 
     # Go to the memory location that we need to be at
     r.cmd('doo;db ' + start + ";db " + stop + ";dc")
+
+    # Execute any r2 commands that the user wants to have executed
+    r.cmd(commands)
 
     # Set the register/memory location that we are bruteforcing to the value that we want it
     if(bruteforceIsMem):
