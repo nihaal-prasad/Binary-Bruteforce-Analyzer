@@ -6,13 +6,13 @@ import os
 import concurrent.futures
 
 # Setup the argument parser
-parser = argparse.ArgumentParser(description="Analyzes specified lines of code by executing the code using given input values, recording the output, and graphing the result.", usage='%(prog)s [options] filename start stop input output range')
-parser.add_argument("filename", help="The name of the executable you would like to bruteforce.")
+parser = argparse.ArgumentParser(description="Analyzes specified lines of code by executing the code using the given input values, recording the output, and displaying the input and output in a graph.", usage='%(prog)s [options] filename start stop input output range')
+parser.add_argument("filename", help="The name of the executable you would like to analyze.")
 parser.add_argument("start", help="The first breakpoint will be set at this location. At the breakpoint, the input register or memory location will be changed to the next value in the range.")
 parser.add_argument("stop", help="The second breakpoint will be set at this location. At the breakpoint, the output will be recorded.")
-parser.add_argument("input", help="The register or memory location that contains the input value that should be bruteforced. Example: \"eax\". If using a memory location, please specify the location using m[location]. Example: \"m[rbp-0x8]\".")
-parser.add_argument("output", help="The register or memory location that contains the output values that should be checked after the code is executed. Example: \"eax\". If using a memory location, please specify the location using m[location]. Example: \"m[rbp-0x8]\".")
-parser.add_argument("range", help="The range of values that should be used for the input during the bruteforce process. Should be in the form \"[lower,upper]\" or \"[lower,upper,step]\". For example: [0,101,5] will use 0, 5, 10, ..., 95, 100 as the input values to be bruteforced. These must be in base 10 (hexadecimal or binary will not work).")
+parser.add_argument("input", help="The register or memory location that contains the input value that should be bruteforced. Will be displayed on the x-axis. Example: \"eax\". If using a memory location, please specify the location using m[location]. Example: \"m[rbp-0x8]\".")
+parser.add_argument("output", help="The register or memory location that contains the output values that should be checked after the code is executed. Will be displayed on the y-axis. Example: \"eax\". If using a memory location, please specify the location using m[location]. Example: \"m[rbp-0x8]\".")
+parser.add_argument("range", help="The range of values that should be used for the input during the bruteforce process. Should be in the form \"[lower,upper]\" or \"[lower,upper,step]\". For example: [0,101,5] will use 0, 5, 10, ..., 95, 100 as the x values in the graph. These must be in base 10 (hexadecimal or binary will not work).")
 
 # Add optional arguments
 parser.add_argument("-t", "--threads", nargs='?', dest="threads", default="5", help="The number of threads that will be used during execution. Default value is 5.")
@@ -22,7 +22,7 @@ parser.add_argument("-ol", "--output-length", nargs='?', dest='output_length', d
 parser.add_argument("-e", "--execute", nargs='?', dest='commands', type=str, default='', help="Executes the given r2 commands in radare2 right after the debugger hits the first breakpoint, but before the input value is set. Example: -e \"dr ebx = 7\" will always set ebx equal to 7 at the first breakpoint. Multiple commands can be separated by a semicolon.")
 parser.add_argument("-hx", "--x-axis-hex", dest='x_is_hex', action='store_const', const=True, default=False, help="Displays the x-axis in hexadecimal instead of denary.")
 parser.add_argument("-hy", "--y-axis-hex", dest='y_is_hex', action='store_const', const=True, default=False, help="Displays the y-axis in hexadecimal instead of denary.")
-parser.add_argument("-j", "--jump", dest='jump', action='store_const', const=True, default=False, help="Instead of running all of the code that comes before the breakpoint, if this option is set, rip will immidiately be set to the start value as soon as the program opens. This will essentially jump over any code that comes before the first breakpoint, and it will make the program only execute the code between the starting and stopping breakpoints.")
+parser.add_argument("-j", "--jump", dest='jump', action='store_const', const=True, default=False, help="Instead of running all of the code that comes before the breakpoint, if this option is set, rip/eip will immidiately be set to the start value as soon as the program opens. This will essentially jump over any code that comes before the first breakpoint, and it will make the program only execute the code between the starting and stopping breakpoints.")
 
 # Parse all of the arguments
 args = parser.parse_args()

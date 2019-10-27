@@ -1,7 +1,8 @@
-# Binary Bruteforce Analyzer
+# Code Grapher
 This program will allow a reverse engineer to analyze a several lines of code by bruteforcing the input values to those lines of code, recording the output, and displaying the results on a graph.
 
 ### Required
+* python3
 * radare2
 * r2pipe (Can be installed using pip)
 * matplotlib (Can be installed using pip)
@@ -52,7 +53,7 @@ This is its object dump:
 ```
 If you run the following command, a graph will appear, which will display all of the outputs for the magic() function when you use inputs in the range [0,100] (0 is inclusive, 100 is exclusive). In this example, there are two breakpoints: sym.magic and sym.main+21. At sym.magic, the input register (which is set to be rdi) is changed to be one of the input values in the specified range. At sym.main+21, eax is read as the output value, and the point (rdi, eax) is plotted onto the graph.
 ```
-python bruteforce_analysis.py example sym.magic sym.main+21 rdi eax [0,100]
+python grapher.py example sym.magic sym.main+21 rdi eax [0,100]
 ```
 ![Image of graph](https://i.postimg.cc/Mp7ysZ0R/Screenshot-from-2019-10-26-19-19-03.png)
 
@@ -64,34 +65,34 @@ Points:
 
 ### Usage
 ```
-$ python bruteforce_analysis.py -h
-usage: bruteforce_analysis.py [options] filename start stop input output range
+$ python grapher.py -h 
+usage: grapher.py [options] filename start stop input output range
 
-Analyzes specified lines of code by executing the code using given input
-values, recording the output, and graphing the result.
+Analyzes specified lines of code by executing the code using the given input
+values, recording the output, and displaying the input and output in a graph.
 
 positional arguments:
-  filename              The name of the executable you would like to
-                        bruteforce.
+  filename              The name of the executable you would like to analyze.
   start                 The first breakpoint will be set at this location. At
                         the breakpoint, the input register or memory location
                         will be changed to the next value in the range.
   stop                  The second breakpoint will be set at this location. At
                         the breakpoint, the output will be recorded.
   input                 The register or memory location that contains the
-                        input value that should be bruteforced. Example:
-                        "eax". If using a memory location, please specify the
-                        location using m[location]. Example: "m[rbp-0x8]".
+                        input value that should be bruteforced. Will be
+                        displayed on the x-axis. Example: "eax". If using a
+                        memory location, please specify the location using
+                        m[location]. Example: "m[rbp-0x8]".
   output                The register or memory location that contains the
                         output values that should be checked after the code is
-                        executed. Example: "eax". If using a memory location,
-                        please specify the location using m[location].
-                        Example: "m[rbp-0x8]".
+                        executed. Will be displayed on the y-axis. Example:
+                        "eax". If using a memory location, please specify the
+                        location using m[location]. Example: "m[rbp-0x8]".
   range                 The range of values that should be used for the input
                         during the bruteforce process. Should be in the form
                         "[lower,upper]" or "[lower,upper,step]". For example:
-                        [0,101,5] will use 0, 5, 10, ..., 95, 100 as the input
-                        values to be bruteforced. These must be in base 10
+                        [0,101,5] will use 0, 5, 10, ..., 95, 100 as the x
+                        values in the graph. These must be in base 10
                         (hexadecimal or binary will not work).
 
 optional arguments:
@@ -123,7 +124,7 @@ optional arguments:
   -hx, --x-axis-hex     Displays the x-axis in hexadecimal instead of denary.
   -hy, --y-axis-hex     Displays the y-axis in hexadecimal instead of denary.
   -j, --jump            Instead of running all of the code that comes before
-                        the breakpoint, if this option is set, rip will
+                        the breakpoint, if this option is set, rip/eip will
                         immidiately be set to the start value as soon as the
                         program opens. This will essentially jump over any
                         code that comes before the first breakpoint, and it
