@@ -4,22 +4,22 @@ import argparse
 import os
 import concurrent.futures
 
-# TODO: Allow users to bruteforce memory locations instead of just registers
-# TODO: Add the option the change the value of certain registers right at the first breakpoint
 # TODO: Add option to execute code right at the first breakpoint
-# TODO: Add an option to show an axis as hex values
+# TODO: Add an option to show an axis as hex values and bruteforce hex values
 # TODO: Add option to set rip/eip equal to the first breakpoint instead of using a breakpoint
 
 # Setup the argument parser
 parser = argparse.ArgumentParser(description="Analyzes specified lines of code by executing the code using given input values, recording the output, and graphing the result.", usage='%(prog)s [options] filename start stop input output range')
 parser.add_argument("filename", help="The name of the executable you would like to bruteforce.")
-parser.add_argument("start", help="The first breakpoint will be set at this location. The input register or memory location will be changed to the next value in the range.")
-parser.add_argument("stop", help="The second breakpoint will be set at this location. The output will be recorded at this location and the process will be stopped.")
-parser.add_argument("input", help="The register or memory location that contains the input value that should be bruteforced.")
-parser.add_argument("output", help="The register or memory location that contains the output values that should be checked after the code is executed.")
-parser.add_argument("range", help="The range of values that should be used for the input during the bruteforce process. Should be in the form \"[lower,upper]\" or \"[lower,upper,step]\". For example: [0,101,5] will use 0, 5, 10, ..., 95, 100 as the input values to be bruteforced.")
+parser.add_argument("start", help="The first breakpoint will be set at this location, where the input register or memory location will be changed to the next value in the range.")
+parser.add_argument("stop", help="The second breakpoint will be set at this location, where the output will be recorded.")
+parser.add_argument("input", help="The register or memory location that contains the input value that should be bruteforced. Example: \"eax\". If using a memory location, please specify the location using m[location]. Example: \"m[rbp-0x8]\".")
+parser.add_argument("output", help="The register or memory location that contains the output values that should be checked after the code is executed. Example: \"eax\". If using a memory location, please specify the location using m[location]. Example: \"m[rbp-0x8]\".")
+parser.add_argument("range", help="The range of values that should be used for the input during the bruteforce process. Should be in the form \"[lower,upper]\" or \"[lower,upper,step]\". For example: [0,101,5] will use 0, 5, 10, ..., 95, 100 as the input values to be bruteforced. These must be in base 10 (hexadecimal or binary will not work).")
 parser.add_argument("-t", "--threads", nargs='?', dest="threads", default="5", help="The number of threads that will be used during execution. Default value is 5.")
 parser.add_argument("-in", "--standard-input", nargs='?', dest='input_file', default='', help="Uses the \'dor stdin=[INPUT_FILE]\' command in radare2 to make the executable read standard input from a given file instead of having the user type it in.")
+parser.add_argument("-il", "--input-length", nargs='?', dest='input_length', default='1', help="The amount of bytes placed at the input memory location. Default value is 1, but this will be automatically adjusted if it is too small. Is only used if the input is a memory location and not a register.")
+parser.add_argument("-ol", "--output-length", nargs='?', dest='output_length', default='1', help="The amount of bytes read at the output memory location. Must be equal to either 1, 2, 4, or 8. Default value is 1. Is only used if the output is a memory location and not a register.")
 
 # Parse all of the arguments
 args = parser.parse_args()
@@ -27,7 +27,15 @@ filename = args.filename
 start = args.start
 stop = args.stop
 bruteforce = args.input
+bruteforceIsMem = False
+if(bruteforce.startswith("m[") and bruteforce[-1]==']'):
+    bruteforceIsMem = True
+    bruteforce = bruteforce[2:-1]
 output = args.output
+outputIsMem = False
+if(output.startswith("m[") and output[-1]==']'):
+    outputIsMem = True
+    output = output[2:-1]
 valueRange = args.range.split(",")
 lower_bound = int(valueRange[0].split("[")[1])
 upper_bound = valueRange[1]
@@ -40,6 +48,8 @@ if(len(valueRange) == 3):
     step = int(valueRange[2][:-1])
 threads = int(args.threads)
 input_file = args.input_file
+input_length = args.input_length
+output_length = args.output_length
 
 # List of tuples that contain the input and its corresponding output. These points will eventually be plotted onto the graph.
 points = []
@@ -56,12 +66,23 @@ def execute(value):
     # Go to the memory location that we need to be at
     r.cmd('doo;db ' + start + ";db " + stop + ";dc")
 
-    # Set the register that we are bruteforcing to the value that we want it to be and continue
-    r.cmd('dr ' + bruteforce + ' = ' + str(value))
+    # Set the register/memory location that we are bruteforcing to the value that we want it
+    if(bruteforceIsMem):
+        hex_value = hex(value)[2:] # Convert the value to hex and delete the "0x" part of it
+        r.cmd('w0 ' + input_length + " @" + bruteforce) # Clears out the memory at the location
+        r.cmd('wB 0x' + hex_value + " @" + bruteforce) # Overwrites the memory location with the value that we are bruteforcing it with
+    else:
+        r.cmd('dr ' + bruteforce + ' = ' + str(value)) # If it's a register, then we just need to use the "dr" command.
+
+    # Continue execution
     r.cmd('dc')
 
-    # Read the value of the register that needs to be checked and record it
-    result = int(r.cmd('dr ' + output).strip(), 16)
+    # Read the value of the register/memory location that needs to be checked and record it
+    result = 0
+    if(outputIsMem):
+        result = int(r.cmd('pv' + output_length + ' @' + output), 16)
+    else:
+        result = int(r.cmd('dr ' + output).strip(), 16)
 
     # Add the point to the list of points
     points.append((value, result))
